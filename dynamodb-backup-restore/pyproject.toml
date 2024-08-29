@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dynamodb-backup-restore"
+version = "0.1.0"
+description = ""
+authors = ["Kelder Passos <kelder.passos@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+blue = "^0.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
