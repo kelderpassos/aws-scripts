@@ -10,8 +10,8 @@ env_variables: dict = {
     'secretAccessKey': os.getenv('SECRET_ACCESS_KEY'),
     'sessionToken': os.getenv('AWS_SESSION_TOKEN')
 }
-temp_tables = ['temp-car_cpfcnpj']
-definitive_tables = ['agrodesk-saas-persistent-infra-stg-car-cpfcnpj-table']
+temp_tables = ['tabela1-temp', 'tabela2-temp', 'tabela3-temp']
+definitive_tables = ['tabela1', 'tabela2', 'tabela3']
 
 def execute():
     dynamodb = DynamoDBManager(env_variables, region)
