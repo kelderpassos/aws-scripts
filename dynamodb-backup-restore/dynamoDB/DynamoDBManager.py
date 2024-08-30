@@ -32,10 +32,8 @@ class DynamoDBManager:
             logging.error('Erro ao listar tabelas: %s', error)
             raise error
 
-    def scan_table(self, table: str, last_evaluated_key: dict = None):
+    def scan_table(self, table: str, last_evaluated_key: str | None = None):
         print('escaneando tabela ', table)
-        print('----1----')
-
         params = {'TableName': table}
 
         if last_evaluated_key:
@@ -47,7 +45,6 @@ class DynamoDBManager:
             if 'LastEvaluatedKey' in response:
                 next_items = self.scan_table(table, response['LastEvaluatedKey'])
                 items.extend(next_items)
-                print('----2----')
             
             print('Itens exportados do DynamoDB')
             return items
@@ -61,8 +58,19 @@ class DynamoDBManager:
         try:
             for item in items:
                 self.client.put_item(TableName = table, Item = item)
-                print('-------')
 
             print('escrita finalizada')
         except ClientError as error:
             logging.error('Não foi possível escrever o item: %s', error)
+
+    def copy_table_data(self, temp_table: str, def_table: str) -> None:
+        paginator = self.client.get_paginator("scan")
+        response = paginator.paginate(
+            TableName=temp_table,
+            Select="ALL_ATTRIBUTES",
+            ReturnConsumedCapacity="NONE",
+            ConsistentRead=True,
+        )
+        for page in response:
+            for item in page["Items"]:
+                self.client.put_item(TableName=def_table, Item=item)
