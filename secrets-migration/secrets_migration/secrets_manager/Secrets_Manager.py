@@ -3,16 +3,9 @@ import logging
 
 
 class SecretsManager():
-    def __init__(self, credentials:dict[str, str], region: str) -> None:
-        session = boto3.Session(
-            aws_access_key_id = credentials['accessKeyId'],
-            aws_secret_access_key = credentials['secretAccessKey'],
-            aws_session_token = credentials['sessionToken'],
-            region_name = region
-        )
-
+    def __init__(self, credentials:dict[str, str]) -> None:
+        session = boto3.Session(**credentials)
         self.client = session.client('secretsmanager')
-        self.region = region
 
     def list_secrets(self):
         try:
@@ -22,14 +15,29 @@ class SecretsManager():
             logging.error('Erro ao listar segredos: %s', error)
             raise error
         
-    def get_secret_value(self, name: str):
+    def get_secret_value(self, name: str, old_account_suffix: str, new_account_suffix: str):
         try:
             response = self.client.get_secret_value(SecretId=name)
-            print('SEGREDOS', response)
+
+            if response.get('Name').endswith(old_account_suffix):
+                new_name = response.get('Name').replace(old_account_suffix, new_account_suffix)
+                response['Name'] = new_name
 
             return response
         except Exception as error:
             logging.error('Erro ao recuperar valor dos segredos: %s', error)
             raise error
-        
-        
+    
+    def create_secret(self, value):
+        new_secret = {
+            'Name': value['Name'],
+            'SecretString': value['SecretString'],
+        }
+
+        try:
+            response = self.client.create_secret(**new_secret)
+            print(response['Name'], 'RESPONSE')
+            return response
+        except Exception as error:
+            logging.error('Erro ao criar segredos: %s', error)
+            raise error
