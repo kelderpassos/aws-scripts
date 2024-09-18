@@ -36,7 +36,6 @@ class SecretsManager():
 
         try:
             response = self.client.create_secret(**new_secret)
-            print(response['Name'], 'RESPONSE')
             return response
         except Exception as error:
             logging.error('Erro ao criar segredos: %s', error)
