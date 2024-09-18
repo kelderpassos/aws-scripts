@@ -8,7 +8,7 @@ def execute():
     secret_list = original_secrets_manager.list_secrets()
     
     for secret in secret_list:
-        value = original_secrets_manager.get_secret_value(secret['Name'], NEW_ACCOUNT_PREFIX, OLD_ACCOUNT_PREFIX)
+        value = original_secrets_manager.get_secret_value(secret['Name'], OLD_ACCOUNT_PREFIX, NEW_ACCOUNT_PREFIX)
         destination_secrets_manager.create_secret(value)
 
 
