@@ -14,7 +14,16 @@ class SecretsManager():
         except Exception as error:
             logging.error('Erro ao listar segredos: %s', error)
             raise error
+
+    def check_existing_secret(self, name:str):
+        secrets = self.list_secrets()
+
+        for secret in secrets:
+            if secret['Name'] == name:
+                return True
         
+        return False
+
     def get_secret_value(self, name: str, old_account_suffix: str, new_account_suffix: str):
         try:
             response = self.client.get_secret_value(SecretId=name)
