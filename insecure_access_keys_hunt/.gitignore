@@ -7,3 +7,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Mypy
+.mypy_cache
+
+# Ruff
+.ruff_cache
