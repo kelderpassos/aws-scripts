@@ -13,6 +13,7 @@ def select_old_keys(access_keys):
             print(key_metadata, 'key')
             age = get_age(key_metadata)
 
+            # TODO: completar o objeto com as infos sobre as chaves antigas
             if age > NINETY:
                 ages.append({
                     'User': key_metadata['UserName'],
@@ -21,7 +22,7 @@ def select_old_keys(access_keys):
     
     return ages
 
-
+# TODO: considerar mudar o nome da função visto que talvez ela não seja uma Lambda
 def handler():
     users = iam.list_users()
     access_keys = iam.list_access_keys(users)
@@ -29,6 +30,7 @@ def handler():
 
     print(old_key, "OLD KEY")
 
+# TODO: agregar pandas para geração de relatório
 
 if __name__ == "__main__":
     handler()
