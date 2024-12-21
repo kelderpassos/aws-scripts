@@ -1,36 +1,38 @@
 from iam.IamManager import IamManager
-from utils.utils import get_age
+from utils.utils import get_age, generate_report
+from typing import List, Dict
 
 
-NINETY = 90
-iam = IamManager()
+NINETY: int = 90
+iam: IamManager = IamManager()
 
-def select_old_keys(access_keys):
+def select_old_keys(access_keys: List[List[Dict[str, str]]]) -> List[Dict[str, str]]:
     ages = []
 
     for key in access_keys:
         for key_metadata in key:
-            print(key_metadata, 'key')
-            age = get_age(key_metadata)
+            if 'CreateDate' in key_metadata:
+                age = get_age(key_metadata)
 
-            # TODO: completar o objeto com as infos sobre as chaves antigas
-            if age > NINETY:
-                ages.append({
-                    'User': key_metadata['UserName'],
-                    # 'Key_age'
-                })
+                if age > NINETY:
+                    ages.append({
+                        'username': key_metadata['UserName'],
+                        'key_age': age,
+                        'key_id': key_metadata['AccessKeyId'],
+                        "status": key_metadata['Status']
+                    })
     
     return ages
 
-# TODO: considerar mudar o nome da função visto que talvez ela não seja uma Lambda
-def handler():
+def main():
     users = iam.list_users()
     access_keys = iam.list_access_keys(users)
-    old_key = select_old_keys(access_keys)
-
-    print(old_key, "OLD KEY")
+    old_keys = select_old_keys(access_keys)
+    print(old_keys, "OLD KEY")
+    return old_keys
 
 # TODO: agregar pandas para geração de relatório
 
 if __name__ == "__main__":
-    handler()
+    old_keys = main()
+    generate_report(old_keys, filename='teste.csv')
