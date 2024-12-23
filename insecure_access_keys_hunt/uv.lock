@@ -254,6 +254,7 @@ dev = [
     { name = "boto3" },
     { name = "boto3-stubs" },
     { name = "moto" },
+    { name = "types-boto3" },
 ]
 
 [package.metadata]
@@ -264,6 +265,7 @@ dev = [
     { name = "boto3", specifier = ">=1.35.84" },
     { name = "boto3-stubs", specifier = ">=1.35.85" },
     { name = "moto", specifier = ">=5.0.24" },
+    { name = "types-boto3", specifier = ">=1.35.86" },
 ]
 
 [[package]]
@@ -606,6 +608,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/dd/97/c62253e8ed65562c67b2138339444cc77507c8ee01c091e02ead1311e4b8/types_awscrt-0.23.6.tar.gz", hash = "sha256:405bce8c281f9e7c6c92a229225cc0bf10d30729a6a601123213389bd524b8b1", size = 15124 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/21/f1/0f0869d35c1b746df98d60016f898eb49db208747a4ed2de81b58f48ecd8/types_awscrt-0.23.6-py3-none-any.whl", hash = "sha256:fbf9c221af5607b24bf17f8431217ce8b9a27917139edbc984891eb63fd5a593", size = 19025 },
+]
+
+[[package]]
+name = "types-boto3"
+version = "1.35.86"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore-stubs" },
+    { name = "types-s3transfer" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bb/91/2bb0c7ba76a469ca12edeaae07ffebd483da0f961bea8dbd94500530d0e6/types_boto3-1.35.86.tar.gz", hash = "sha256:1dd67772ccda886441222ee7815bf37cab5bd0331e07f420fd338a37c5fbec1f", size = 99325 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/c0/fe45ad39226522095b401c6087a6a3f975697bad068e14ce39cac7f8ad7a/types_boto3-1.35.86-py3-none-any.whl", hash = "sha256:fc2631a74d82e1a219967c72c32d60c0daf95a6a34816d1747722c6673d0d102", size = 68344 },
 ]
 
 [[package]]
