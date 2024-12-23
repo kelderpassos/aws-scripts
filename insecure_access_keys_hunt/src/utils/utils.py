@@ -1,5 +1,6 @@
 import csv
 import datetime
+import logging
 import os
 import configparser
 
@@ -14,7 +15,6 @@ def get_age(key_metadata):
 def generate_report(keys, filename) -> None:
     with open(filename, mode="w", newline="") as file:
         writer = csv.writer(file)
-        print(writer, writer)
         writer.writerow(["UserName", "AccessKeyId", "CreateDate", "AgeDays"])
 
         for key in keys:
@@ -23,11 +23,16 @@ def generate_report(keys, filename) -> None:
             )
 
 
-def input_values() -> Dict[str, Union[str, int]]:
+def input_values() -> Dict[str, Union[str, int]] | None:
     path = os.path.expanduser("~/.aws/credentials")
+    logging.info(path, "caminho")
+    
     config = configparser.ConfigParser()
     config.read(path)
     profiles = config.sections()
+    if not profiles:
+        logging.error("Nenhuma credencial foi encontrada")
+        return None
 
     print("Perfis disponíveis")
     for index, profile in enumerate(profiles):
@@ -39,9 +44,5 @@ def input_values() -> Dict[str, Union[str, int]]:
     if not (0 <= profile_chosen < len(profiles)):
         raise ValueError("Índice inválido")
 
-    mapped_inputs: dict = {
-        "age": age_limit,
-        "profile": profiles[profile_chosen]
-    }
+    mapped_inputs: dict = {"age": age_limit, "profile": profiles[profile_chosen]}
     return mapped_inputs
-
