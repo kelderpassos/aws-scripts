@@ -1,8 +1,7 @@
-from iam.IamManager import IamManager
-from utils.utils import get_age, generate_report, input_values
-import logging
-from typing import List, Dict
+from typing import Dict, List
 
+from iam.IamManager import IamManager
+from utils.utils import generate_report, get_age, input_values
 
 inputs = input_values()
 
@@ -33,12 +32,17 @@ def select_old_keys(
 def main():
     iam: IamManager = IamManager(profile=inputs["profile"])
 
+    print("Listando usuários e chaves de acesso...")
     users = iam.list_users()
+
     access_keys = iam.list_access_keys(users)
     old_keys = select_old_keys(access_keys, inputs["age"])
 
     if len(old_keys) == 0:
-        logging.info(f"Não há chaves mais velhas que {inputs['age']}")
+        print(f"Não há chaves mais velhas que {inputs['age']} dias")
+    else:
+        print(f"{len(old_keys)} chaves mais velhas que {inputs['age']} encontradas")
+
     return old_keys
 
 
