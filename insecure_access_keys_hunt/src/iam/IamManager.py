@@ -1,7 +1,7 @@
-from boto3 import client, Session, session
 import logging
-from typing import List, Dict
+from typing import Dict, List
 
+from boto3 import Session, session
 
 
 class IamManager:
@@ -11,6 +11,7 @@ class IamManager:
             self.iam = aws_profile.client("iam")
         except Exception as err:
             logging.error(f"Erro ao se conectar ao cliente: {err}")
+            exit(1)
 
     def list_users(self) -> List[Dict[str, str]]:
         try:
@@ -33,3 +34,6 @@ class IamManager:
             logging.error(f"Erro ao listar chaves: {err}")
             return []
 
+    def delete_access_keys(self):
+        # TODO continuar a implementação. Levar em consideração chaves ativas e inativas
+        pass
