@@ -1,9 +1,8 @@
+import configparser
 import csv
 import datetime
 import logging
 import os
-import configparser
-
 from typing import Dict, Union
 
 
@@ -13,36 +12,49 @@ def get_age(key_metadata):
 
 
 def generate_report(keys, filename) -> None:
-    with open(filename, mode="w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["UserName", "AccessKeyId", "CreateDate", "AgeDays"])
+    try:
+        with open(filename, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["UserName", "AccessKeyId", "CreateDate", "AgeDays"])
 
-        for key in keys:
-            writer.writerow(
-                [key["username"], key["key_id"], key["status"], key["key_age"]]
+            for key in keys:
+                writer.writerow(
+                    [key["username"], key["key_id"], key["status"], key["key_age"]]
+                )
+        print(f"Relatório gerado com sucesso: {filename}")
+    except PermissionError as e:
+        logging.error(f"Erro de permissão ao escrever o arquivo {filename}: {e}")
+    except Exception as e:
+        logging.error(f"Erro inesperado ao gerar o relatório: {e}")
+
+
+def input_values() -> Dict[str, Union[str, int]]:
+    try:
+        path = os.path.expanduser("~/.aws/credentials")
+
+        config = configparser.ConfigParser()
+        config.read(path)
+        profiles = config.sections()
+        if not profiles:
+            logging.error(
+                "Nenhuma credencial foi encontrada. Verifique o caminho ~/.aws/credentials"
             )
+            exit(1)
 
+        print("Perfis encontrados. Escolha um pelo número:")
+        for index, profile in enumerate(profiles):
+            print(f"{index + 1} {profile}")
 
-def input_values() -> Dict[str, Union[str, int]] | None:
-    path = os.path.expanduser("~/.aws/credentials")
-    logging.info(path, "caminho")
-    
-    config = configparser.ConfigParser()
-    config.read(path)
-    profiles = config.sections()
-    if not profiles:
-        logging.error("Nenhuma credencial foi encontrada")
-        return None
+        profile_chosen = int(input()) - 1
+        if not (0 <= profile_chosen < len(profiles)):
+            logging.error("Índice inválido")
+            exit(1)
 
-    print("Perfis disponíveis")
-    for index, profile in enumerate(profiles):
-        print(f"{index + 1} {profile}")
-
-    profile_chosen = int(input("Escolha o perfil pelo número: ")) - 1
-    age_limit = int(input("Defina o limite de idade das chaves: "))
-
-    if not (0 <= profile_chosen < len(profiles)):
-        raise ValueError("Índice inválido")
-
-    mapped_inputs: dict = {"age": age_limit, "profile": profiles[profile_chosen]}
-    return mapped_inputs
+        age_limit = int(input("Defina o limite de idade das chaves em dias: "))
+        return {"age": age_limit, "profile": profiles[profile_chosen]}
+    except ValueError as e:
+        logging.error(f"Erro de entrada do usuário: {e}")
+        exit(1)
+    except Exception as e:
+        logging.error(f"Erro inesperado: {e}")
+        exit(1)
