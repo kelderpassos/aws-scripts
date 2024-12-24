@@ -13,3 +13,6 @@ wheels/
 
 # Ruff
 .ruff_cache
+
+# Other files
+*.csv
