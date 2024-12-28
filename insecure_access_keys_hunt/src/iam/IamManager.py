@@ -34,6 +34,13 @@ class IamManager:
             logging.error(f"Erro ao listar chaves: {err}")
             return []
 
-    def delete_access_keys(self):
-        # TODO continuar a implementação. Levar em consideração chaves ativas e inativas
-        pass
+    def delete_access_keys(self, users: List[Dict[str, str]]):
+        try:
+            for user in users:
+                self.iam.delete_access_key(
+                    UserName=user["UserName"], AccessKeyId=user["AccessKeyId"]
+                )
+                print(f"Access Key {user['AccessKeyId']} deleted")
+            return
+        except self.iam.exceptions.ClientError as err:
+            logging.error(f"Erro ao listar chaves: {err}")
