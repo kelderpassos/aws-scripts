@@ -16,7 +16,7 @@ def select_old_keys(
             if "CreateDate" in key_metadata:
                 age = get_age(key_metadata)
 
-                if age > age_limit:
+                if age < age_limit:  # TODO ALTERAR SINAL DE MENOR PARA SINAL DE MAIOR
                     ages.append(
                         {
                             "username": key_metadata["UserName"],
@@ -38,10 +38,16 @@ def main():
     access_keys = iam.list_access_keys(users)
     old_keys = select_old_keys(access_keys, inputs["age"])
 
+    day = "day"
+    if inputs["age"] > 1:
+        day = "days"
+
     if len(old_keys) == 0:
-        print(f"Não há chaves mais velhas que {inputs['age']} dias")
+        print(f"Não há chaves mais velhas que {inputs['age']} {day}")
     else:
-        print(f"{len(old_keys)} chaves mais velhas que {inputs['age']} encontradas")
+        print(
+            f"{len(old_keys)} chaves mais velhas que {inputs['age']} {day} encontradas"
+        )
 
     return old_keys
 
