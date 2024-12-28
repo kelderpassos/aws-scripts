@@ -10,6 +10,7 @@ wheels/
 
 # Mypy
 .mypy_cache
+mypy
 
 # Ruff
 .ruff_cache
