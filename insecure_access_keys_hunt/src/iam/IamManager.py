@@ -1,19 +1,24 @@
 import logging
 from typing import Dict, List
 
-from boto3 import Session, session
+from boto3.session import Session
+from mypy.mypy_boto3_iam_package.mypy_boto3_iam import IAMClient
+from mypy.mypy_boto3_iam_package.mypy_boto3_iam.type_defs import (
+    AccessKeyMetadataTypeDef,
+    UserTypeDef,
+)
 
 
 class IamManager:
-    def __init__(self, profile=None) -> None:
+    def __init__(self, profile: str | None = None) -> None:
         try:
-            aws_profile: Session = session.Session(profile_name=profile)
-            self.iam = aws_profile.client("iam")
+            session: Session = Session(profile_name=profile)
+            self.iam: IAMClient = session.client("iam")
         except Exception as err:
             logging.error(f"Erro ao se conectar ao cliente: {err}")
             exit(1)
 
-    def list_users(self) -> List[Dict[str, str]]:
+    def list_users(self) -> list[UserTypeDef]:
         try:
             return self.iam.list_users()["Users"]
         except self.iam.exceptions.ClientError as err:
@@ -22,7 +27,7 @@ class IamManager:
 
     def list_access_keys(
         self, users: List[Dict[str, str]]
-    ) -> List[List[Dict[str, str]]]:
+    ) -> list[list[AccessKeyMetadataTypeDef]]:
         all_access_key = []
 
         try:
@@ -43,4 +48,4 @@ class IamManager:
                 print(f"Access Key {user['AccessKeyId']} deleted")
             return
         except self.iam.exceptions.ClientError as err:
-            logging.error(f"Erro ao listar chaves: {err}")
+            logging.error(f"Erro ao apagar chaves: {err}")
