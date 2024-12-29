@@ -43,3 +43,6 @@ line-ending = "auto"
 
 docstring-code-format = true
 docstring-code-line-length = "dynamic"
+
+[lint.isort]
+known-third-party = ["boto3", "mypy"]
