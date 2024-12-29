@@ -66,11 +66,11 @@ def input_values(delete=2) -> InputValues:
         print("1 - sim")
         print("2 - não")
         to_delete = int(input())
-        print(to_delete)
-        if delete != to_delete:
-            return InputValues(age= age_limit, profile= profiles[profile_chosen], to_delete= to_delete)
 
-        return InputValues(age= age_limit, profile= profiles[profile_chosen])
+        if to_delete not in [1, 2]:
+            logging.error("Opção inválida")
+    
+        return InputValues(age= age_limit, profile= profiles[profile_chosen], to_delete=to_delete)
     except ValueError as e:
         logging.error(f"Erro de entrada do usuário: {e}")
         exit(1)
