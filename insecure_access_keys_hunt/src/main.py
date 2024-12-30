@@ -1,61 +1,50 @@
-from typing import Dict, List
-
 from iam.IamManager import IamManager
-from utils.utils import generate_report, get_age, input_values
+from utils.utils import access_key_scan, delete_keys, generate_report, get_age
 
-inputs = input_values()
-iam = IamManager(profile=inputs.profile)
+replies = access_key_scan()
+iam = IamManager(profile=replies.profile)
 
-def select_old_keys(
-    access_keys: List[List[Dict[str, str]]], age_limit: int
-) -> List[Dict[str, str]]:
-    ages = []
+
+def get_old_keys():
+    print("Listando usuários e chaves de acesso...")
+    users = iam.list_users()
+    access_keys = iam.list_access_keys(users)
+
+    old_keys = []
 
     for key in access_keys:
         for key_metadata in key:
             if "CreateDate" in key_metadata:
                 age = get_age(key_metadata)
 
-                if age < age_limit:  # TODO ALTERAR SINAL DE MENOR PARA SINAL DE MAIOR
-                    ages.append(
+                if age < replies.age:  # TODO ALTERAR SINAL DE MENOR PARA SINAL DE MAIOR
+                    old_keys.append(
                         {
-                            "username": key_metadata["UserName"],
+                            "username": key_metadata.get("UserName", "Unknown"),
                             "key_age": age,
-                            "key_id": key_metadata["AccessKeyId"],
-                            "status": key_metadata["Status"],
+                            "key_id": key_metadata.get("AccessKeyId", "Unknown"),
+                            "status": key_metadata.get("Status", "Unknown"),
                         }
                     )
 
-    return ages
-
-
-def get_old_keys():
-
-    print("Listando usuários e chaves de acesso...")
-    users = iam.list_users()
-
-    access_keys = iam.list_access_keys(users)
-    old_keys = select_old_keys(access_keys, inputs["age"])
-
-    day = "dia"
-    chave = "chave"
-    if inputs["age"] > 1:
-        day = "dias"
-
-    print(inputs, "INPUTS")
-
     if len(old_keys) == 0:
-        print(f"Não há chaves mais velhas que {inputs['age']} {day}")
+        print(f"Não há chaves mais velhas que {replies.age}")
     else:
-        print(
-            f"{len(old_keys)} {chave} mais velhas que {inputs['age']} {day} encontradas"
-        )
-
-    
+        print(f"{len(old_keys)} chaves mais velhas que {replies.age} encontradas")
 
     return old_keys
 
 
+def delete_old_keys(old_keys) -> None:
+    for old_key in old_keys:
+        iam.delete_access_keys(old_key)
+
+
 if __name__ == "__main__":
     old_keys = get_old_keys()
-    generate_report(old_keys, filename=f"report-{inputs.profile}.csv")
+    generate_report(old_keys, filename=f"report-{replies.profile}.csv")
+    to_delete = delete_keys()
+
+    if to_delete == 1:
+        delete_old_keys(old_keys)
+    print("Script finalizado")
