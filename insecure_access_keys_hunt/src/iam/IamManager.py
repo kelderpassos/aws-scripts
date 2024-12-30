@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict
 
 from boto3.session import Session
 from mypy.mypy_boto3_iam_package.mypy_boto3_iam import IAMClient
@@ -26,7 +26,7 @@ class IamManager:
             return []
 
     def list_access_keys(
-        self, users: List[Dict[str, str]]
+        self, users: list[UserTypeDef]
     ) -> list[list[AccessKeyMetadataTypeDef]]:
         all_access_key = []
 
@@ -39,13 +39,13 @@ class IamManager:
             logging.error(f"Erro ao listar chaves: {err}")
             return []
 
-    def delete_access_keys(self, users: List[Dict[str, str]]):
+    def delete_access_keys(self, user: Dict[str, str]):
+        print(user, 'USER')
         try:
-            for user in users:
-                self.iam.delete_access_key(
-                    UserName=user["UserName"], AccessKeyId=user["AccessKeyId"]
-                )
-                print(f"Access Key {user['AccessKeyId']} deleted")
+            self.iam.delete_access_key(
+                UserName=user["username"], AccessKeyId=user["key_id"]
+            )
+            print(f"Access Key {user['key_id']} deleted")
             return
         except self.iam.exceptions.ClientError as err:
             logging.error(f"Erro ao apagar chaves: {err}")
