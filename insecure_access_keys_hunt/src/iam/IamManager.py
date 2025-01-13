@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from boto3.session import Session
 from mypy.mypy_boto3_iam_package.mypy_boto3_iam import IAMClient
@@ -39,8 +38,7 @@ class IamManager:
             logging.error(f"Erro ao listar chaves: {err}")
             return []
 
-    def delete_access_keys(self, user: Dict[str, str]):
-        print(user, 'USER')
+    def delete_access_keys(self, user: dict[str, str]):
         try:
             self.iam.delete_access_key(
                 UserName=user["username"], AccessKeyId=user["key_id"]
@@ -49,3 +47,4 @@ class IamManager:
             return
         except self.iam.exceptions.ClientError as err:
             logging.error(f"Erro ao apagar chaves: {err}")
+            exit(1)
