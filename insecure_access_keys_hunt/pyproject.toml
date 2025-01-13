@@ -13,7 +13,7 @@ dev = [
     "boto3-stubs>=1.35.85",
     "boto3>=1.35.84",
     "moto>=5.0.24",
-    "types-boto3>=1.35.86",
+    "types-boto3>=1.35.97",
 ]
 
 
