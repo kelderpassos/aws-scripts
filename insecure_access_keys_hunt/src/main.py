@@ -1,12 +1,18 @@
 from iam.IamManager import IamManager
-from utils.utils import access_key_scan, generate_report, get_age, get_delete_reply
+from utils.utils import (
+    access_key_scan,
+    generate_report,
+    get_age,
+    get_delete_reply,
+    print_separator,
+)
 
 replies = access_key_scan()
 iam = IamManager(profile=replies.profile)
 
 
 def get_old_keys():
-    print("---------------------------")    
+    print_separator()
     print("Listando usuários e chaves de acesso...")
     users = iam.list_users()
     access_keys = iam.list_access_keys(users)
@@ -46,6 +52,6 @@ if __name__ == "__main__":
     generate_report(old_keys, filename=f"report-{replies.profile}.csv")
     delete_reply = get_delete_reply()
 
-    if delete_reply == 1:
+    if delete_reply:
         delete_old_keys(old_keys)
     print("Script finalizado")
