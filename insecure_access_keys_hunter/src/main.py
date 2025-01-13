@@ -50,8 +50,13 @@ def delete_old_keys(old_keys) -> None:
 if __name__ == "__main__":
     old_keys = get_old_keys()
     generate_report(old_keys, filename=f"report-{replies.profile}.csv")
-    delete_reply = get_delete_reply()
+
+    delete_reply = None
+
+    if len(old_keys) > 0:
+        delete_reply = get_delete_reply()
 
     if delete_reply:
         delete_old_keys(old_keys)
+
     print("Script finalizado")
