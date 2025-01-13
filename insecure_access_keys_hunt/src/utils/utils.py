@@ -11,12 +11,15 @@ class InputValues:
     age: int
     profile: str | None
 
+
 def print_separator():
     print("---------------------------")
+
 
 def get_age(key_metadata):
     age = datetime.datetime.now(datetime.timezone.utc) - key_metadata["CreateDate"]
     return age.days
+
 
 def access_key_scan() -> InputValues:
     path = os.path.expanduser("~/.aws/credentials")
@@ -26,7 +29,9 @@ def access_key_scan() -> InputValues:
     profiles = config.sections()
 
     if not profiles:
-        raise RuntimeError("Nenhuma credencial foi encontrada. Verifique o caminho ~/.aws/credentials")
+        raise RuntimeError(
+            "Nenhuma credencial foi encontrada. Verifique o caminho ~/.aws/credentials"
+        )
 
     print("Perfis encontrados. Escolha um pelo número:")
     for index, profile in enumerate(profiles):
@@ -37,18 +42,19 @@ def access_key_scan() -> InputValues:
         if not (0 <= profile_chosen < len(profiles)):
             raise ValueError("Índice inválido")
 
-        age_limit = int(input("Defina o limite de idade das chaves em dias: "))    
+        age_limit = int(input("Defina o limite de idade das chaves em dias: "))
         return InputValues(age=age_limit, profile=profiles[profile_chosen])
     except ValueError as e:
         logging.error(f"Erro de entrada do usuário: {e}")
         raise
 
+
 def generate_report(keys, filename) -> None:
+    current_directory = os.getcwd()
     try:
-        current_directory = os.getcwd()
         with open(filename, mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["UserName", "AccessKeyId", "CreateDate", "AgeDays"])
+            writer.writerow(["UserName", "AccessKeyId", "Status", "AgeDays"])
 
             for key in keys:
                 writer.writerow(
@@ -61,16 +67,13 @@ def generate_report(keys, filename) -> None:
     except Exception as e:
         logging.error(f"Erro inesperado ao gerar o relatório: {e}")
 
-def get_delete_reply() -> int:
+
+def get_delete_reply() -> bool:
     print_separator()
-    print('Deseja apagar as chaves encontradas? Esta ação não pode ser desfeita')
-    print('1 - sim')
-    print('2 - não')
+    print("Deseja apagar as chaves encontradas? (1 - Sim, 2 - Não)")
 
-    reply = int(input())
-
-    if not (reply == 1 or reply == 2):
+    try:
+        return int(input().strip()) == 1
+    except ValueError:
         logging.error("Escolha 1 ou 2 para responder")
-        exit(1)
-
-    return reply
+        return False
