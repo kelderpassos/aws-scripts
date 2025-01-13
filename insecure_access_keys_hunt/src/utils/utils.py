@@ -11,41 +11,37 @@ class InputValues:
     age: int
     profile: str | None
 
+def print_separator():
+    print("---------------------------")
+
 def get_age(key_metadata):
     age = datetime.datetime.now(datetime.timezone.utc) - key_metadata["CreateDate"]
     return age.days
 
 def access_key_scan() -> InputValues:
+    path = os.path.expanduser("~/.aws/credentials")
+
+    config = configparser.ConfigParser()
+    config.read(path)
+    profiles = config.sections()
+
+    if not profiles:
+        raise RuntimeError("Nenhuma credencial foi encontrada. Verifique o caminho ~/.aws/credentials")
+
+    print("Perfis encontrados. Escolha um pelo número:")
+    for index, profile in enumerate(profiles):
+        print(f"{index + 1} - {profile}")
+
     try:
-        path = os.path.expanduser("~/.aws/credentials")
-
-        config = configparser.ConfigParser()
-        config.read(path)
-        profiles = config.sections()
-        if not profiles:
-            logging.error(
-                "Nenhuma credencial foi encontrada. Verifique o caminho ~/.aws/credentials"
-            )
-            exit(1)
-
-        print("Perfis encontrados. Escolha um pelo número:")
-        for index, profile in enumerate(profiles):
-            print(f"{index + 1} - {profile}")
-
         profile_chosen = int(input()) - 1
         if not (0 <= profile_chosen < len(profiles)):
-            logging.error("Índice inválido")
-            exit(1)
+            raise ValueError("Índice inválido")
 
-        age_limit = int(input("Defina o limite de idade das chaves em dias: "))
-    
+        age_limit = int(input("Defina o limite de idade das chaves em dias: "))    
         return InputValues(age=age_limit, profile=profiles[profile_chosen])
     except ValueError as e:
         logging.error(f"Erro de entrada do usuário: {e}")
-        exit(1)
-    except Exception as e:
-        logging.error(f"Erro inesperado: {e}")
-        exit(1)
+        raise
 
 def generate_report(keys, filename) -> None:
     try:
@@ -58,16 +54,23 @@ def generate_report(keys, filename) -> None:
                 writer.writerow(
                     [key["username"], key["key_id"], key["status"], key["key_age"]]
                 )
+        print_separator()
         print(f"Relatório {filename} gerado com sucesso no caminho {current_directory}")
     except PermissionError as e:
         logging.error(f"Erro de permissão ao escrever o arquivo {filename}: {e}")
     except Exception as e:
         logging.error(f"Erro inesperado ao gerar o relatório: {e}")
 
-def delete_keys():
-    print("---------------------------")
+def get_delete_reply() -> int:
+    print_separator()
     print('Deseja apagar as chaves encontradas? Esta ação não pode ser desfeita')
     print('1 - sim')
     print('2 - não')
 
-    return int(input())
+    reply = int(input())
+
+    if not (reply == 1 or reply == 2):
+        logging.error("Escolha 1 ou 2 para responder")
+        exit(1)
+
+    return reply
