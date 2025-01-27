@@ -1,0 +1,8 @@
+SERVICE_NAME_PREFIX: ${self:service}
+
+S3_BUCKET_NAME: bigtrade-dynamodb-${sls:stage}-routine
+S3_DEPLOYMENT_BUCKET_NAME: bigtrade-serverless-artifacts
+S3_BUCKET_TAG_PROJECT_TYPE: business-continuity
+S3_BUCKET_TAG_PROJECT_TEAM: dev-sec-ops
+S3_BUCKET_LIFECYCLE_PREFIX: backup-
+

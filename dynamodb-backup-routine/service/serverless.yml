@@ -1,0 +1,71 @@
+service: bigtrade-dynamodb-backup-routine
+
+plugins:
+  - serverless-deployment-bucket
+  - serverless-esbuild
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${opt:region, "us-east-1"}
+  stage: ${opt:stage, "backup"}
+  environment: ${file(./serverless/provider/environment.yml)}
+  deploymentBucket:
+    name: ${self:custom.S3_DEPLOYMENT_BUCKET_NAME}
+
+resources:
+  - ${file(./serverless/resources/iam/backupTriggerRole.yml)}
+  - ${file(./serverless/resources/iam/backupExportToS3Role.yml)}
+  - ${file(./serverless/resources/iam/backupProvisionTablesRole.yml)}
+  - ${file(./serverless/resources/iam/backupWriteItemsRole.yml)}
+
+custom: ${file(./serverless/custom/variables.yml)}
+
+functions:
+  dynamodb-backup-trigger:
+    handler: src/trigger.handler
+    name: bigtrade-dynamodb-${sls:stage}-trigger
+    description: Lambda function to trigger DynamoDB backup process
+    role: DynamoDBBackupTriggerLambdaRole
+    timeout: 900
+    memorySize: 1024
+    events:
+      - schedule: cron(30 23 * * ? *)
+
+  dynamodb-backup-exportItemsToS3:
+    handler: src/lambda/exportItemsToS3.handler
+    name: bigtrade-dynamodb-${sls:stage}-export-items
+    description: Lambda function to export items from DynamoDB tables to S3
+    role: DynamoDBBackupExportItemsToS3LambdaRole
+    timeout: 900
+    memorySize: 2048
+    events:
+      - sqs:
+          arn: ${self:custom.SSM_EXPORT_ITEMS_TO_S3_QUEUE_ARN}
+          batchSize: 1
+
+  dynamodb-backup-provision-tables:
+    handler: src/lambda/provisionTables.handler
+    name: bigtrade-dynamodb-${sls:stage}-provision-tables
+    description: Lambda function to provision DynamoDB tables
+    role: DynamoDBBackupProvisionTablesLambdaRole
+    timeout: 900
+    memorySize: 1024
+    events:
+      - sqs:
+          arn: ${self:custom.SSM_PROVISION_DYNAMODB_TABLES_QUEUE_ARN}
+          batchSize: 1
+
+  dynamodb-backup-write-dynamodb-items:
+    handler: src/lambda/writeItems.handler
+    name: bigtrade-dynamodb-${sls:stage}-write-items
+    description: Lambda function to write items to DynamoDB tables
+    role: DynamoDBBackupWriteItemsLambdaRole
+    timeout: 900
+    memorySize: 1024
+    events:
+      - sqs:
+          arn: ${self:custom.SSM_WRITE_DYNAMODB_ITEMS_QUEUE_ARN}
+          batchSize: 1

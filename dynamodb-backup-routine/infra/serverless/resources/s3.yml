@@ -1,0 +1,31 @@
+Resources:
+  DynamoBackupBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.S3_BUCKET_NAME}
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Environment
+          Value: ${sls:stage}
+        - Key: Project
+          Value: ${self:custom.SERVICE_NAME_PREFIX}
+        - Key: Team
+          Value: ${self:custom.S3_BUCKET_TAG_PROJECT_TEAM}
+        - Key: Type
+          Value: ${self:custom.S3_BUCKET_TAG_PROJECT_TYPE}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToGlacier
+            Prefix: ${self:custom.S3_BUCKET_LIFECYCLE_PREFIX}
+            Status: Enabled
+            ExpirationInDays: 365
+            Transitions:
+              - TransitionInDays: 15
+                StorageClass: DEEP_ARCHIVE

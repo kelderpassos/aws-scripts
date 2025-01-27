@@ -1,0 +1,62 @@
+Resources:
+  DynamoDBBackupProvisionTablesLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: dynamoDB-backup-provision-tables-lambdaRole
+      Description: Role to allow the provision of DynamoDB tables into backup account
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StsBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sts:AssumeRole
+                Resource:
+                  - arn:aws:iam::${self:custom.SSM_ORIGIN_ACCOUNT_ID}:role/${self:custom.SSM_ROLE_TO_ASSUME}
+        - PolicyName: DynamoDBBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeTable
+                Resource:
+                  - arn:aws:dynamodb:${self:provider.region}:${self:custom.SSM_ORIGIN_ACCOUNT_ID}:table/*
+              - Effect: Allow
+                Action:
+                  - dynamodb:CreateTable
+                  - dynamodb:ListTables
+                Resource:
+                  - arn:aws:dynamodb:${self:provider.region}:${self:custom.SSM_BACKUP_ACCOUNT_ID}:table/*
+        - PolicyName: SqsBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                Resource:
+                  - ${self:custom.SSM_PROVISION_DYNAMODB_TABLES_QUEUE_ARN}
+        - PolicyName: CloudwatchPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:TagResource
+                Resource:
+                  - arn:aws:logs:${self:provider.region}:${self:custom.SSM_BACKUP_ACCOUNT_ID}:log-group:*

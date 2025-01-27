@@ -1,0 +1,24 @@
+Resources:
+  DynamoDBExportItemsToS3Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: dynamodb-${sls:stage}-export-items-to-s3-queue.fifo
+      FifoQueue: true
+      VisibilityTimeout: 900
+      MessageRetentionPeriod: 900
+
+  DynamoDBProvisionTablesQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: dynamodb-${sls:stage}-provision-tables-queue.fifo
+      FifoQueue: true
+      VisibilityTimeout: 900
+      MessageRetentionPeriod: 900
+
+  DynamoDBWriteItemsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: dynamodb-${sls:stage}-write-items-queue.fifo
+      FifoQueue: true
+      VisibilityTimeout: 900
+      MessageRetentionPeriod: 900

@@ -1,0 +1,57 @@
+Resources:
+  DynamoDBBackupWriteItemsLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: dynamoDB-backup-write-items-lambdaRole
+      Description: Role to write items to DynamoDB tables
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: DynamoDBBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource:
+                  - arn:aws:dynamodb:us-east-1:${self:custom.SSM_BACKUP_ACCOUNT_ID}:table/*
+        - PolicyName: S3BackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource:
+                  - arn:aws:s3:::${self:custom.S3_BUCKET_NAME}
+                  - arn:aws:s3:::${self:custom.S3_BUCKET_NAME}/*
+        - PolicyName: SqsBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueUrl
+                  - sqs:GetQueueAttributes
+                Resource:
+                  - ${self:custom.SSM_WRITE_DYNAMODB_ITEMS_QUEUE_ARN}
+        - PolicyName: CloudwatchBackupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:TagResource
+                Resource:
+                  - arn:aws:logs:us-east-1:${self:custom.SSM_BACKUP_ACCOUNT_ID}:log-group:*

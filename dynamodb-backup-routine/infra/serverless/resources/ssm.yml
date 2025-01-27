@@ -1,0 +1,53 @@
+Resources:
+  OriginAccountID:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/ORIGIN_ACCOUNT_ID
+      Type: String
+      Value: 816240530834
+  BackupAccountID:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/BACKUP_ACCOUNT_ID
+      Type: String
+      Value: 590184135948
+  RoleToAssume:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/ROLE_TO_ASSUME
+      Type: String
+      Value: DevTeam
+  SlackWebhookURL:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/SLACK_WEBHOOK_URL
+      Type: String
+      Value: https://hooks.slack.com/triggers/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
+#SQS
+  ExportItemsToS3QueueArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/EXPORT_ITEMS_TO_S3_QUEUE_ARN
+      Type: String
+      Value: 
+        Fn::GetAtt:
+          - DynamoDBExportItemsToS3Queue
+          - Arn
+  ProvisionTablesQueueArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/PROVISION_DYNAMODB_TABLES_QUEUE_ARN
+      Type: String
+      Value: 
+        Fn::GetAtt:
+          - DynamoDBProvisionTablesQueue
+          - Arn
+  WriteItemsQueueArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /${self:custom.SERVICE_NAME_PREFIX}/WRITE_DYNAMODB_ITEMS_QUEUE_ARN
+      Type: String
+      Value: 
+        Fn::GetAtt:
+          - DynamoDBWriteItemsQueue
+          - Arn

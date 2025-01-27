@@ -1,0 +1,20 @@
+service: bigtrade-dynamodb-backup-routine-infra
+
+plugins: serverless-deployment-bucket
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, "us-east-1"}
+  stage: ${opt:stage, "backup"}
+  deploymentBucket:
+    name: bigtrade-serverless-artifacts-${sls:stage}
+
+custom: ${file(./serverless/custom/variables.yml)}
+
+resources:
+  - ${file(./serverless/resources/ssm.yml)}
+  - ${file(./serverless/resources/s3.yml)}
+  - ${file(./serverless/resources/sqs.yml)}

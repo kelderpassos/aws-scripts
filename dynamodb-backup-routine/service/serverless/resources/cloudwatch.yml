@@ -1,0 +1,21 @@
+Resources:
+  TriggerLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/database-backup/dynamo/lambda/${self:custom.SERVICE_NAME_PREFIX}-trigger
+      RetentionInDays: 7
+  ExportItemsToS3Log:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/database-backup/dynamo/lambda/${self:custom.SERVICE_NAME_PREFIX}-export-items-to-s3
+      RetentionInDays: 7
+  ProvisionTablesLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/database-backup/dynamo/lambda/${self:custom.SERVICE_NAME_PREFIX}-provision-tables
+      RetentionInDays: 7
+  WriteItemsLog:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/database-backup/dynamo/lambda/${self:custom.SERVICE_NAME_PREFIX}-write-items
+      RetentionInDays: 7

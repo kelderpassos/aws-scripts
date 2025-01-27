@@ -1,0 +1,15 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy:backup": "sls deploy --aws-profile bigtrade-agrodesk-backup --stage backup --verbose"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-deployment-bucket": "^1.6.0"
+  }
+}
