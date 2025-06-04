@@ -45,22 +45,6 @@ class SecretsManager:
             logging.error("Error listing secrets: %s", error)
             raise error
 
-    def check_existing_secret(self, name: str) -> bool:
-        """
-        Checks if a secret with the specified name exists.
-
-        Args:
-            name (str): The name of the secret.
-
-        Returns:
-            bool: True if the secret exists, False otherwise.
-        """
-        secrets = self.list_secrets()
-        for secret in secrets:
-            if secret["Name"] == name:
-                return True
-        return False
-
     def get_secret_value(self, name: str):
         """
         Retrieves the value of a secret by its name.
